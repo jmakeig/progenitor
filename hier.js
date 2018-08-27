@@ -9,11 +9,20 @@ class Hierarchy {
     }
     return this.children.reduce((prev, curr) => prev + curr.leaves(), 0);
   }
+  get hasChildren() {
+    return this.children.length > 0;
+  }
   depth() {
-    if (0 === children.length) {
-      return 1;
+    var depth = 0;
+    if (this.children) {
+      this.children.forEach(function(d) {
+        let tmpDepth = d.depth();
+        if (tmpDepth > depth) {
+          depth = tmpDepth;
+        }
+      });
     }
-    // AHHHHHHHHHH!
+    return 1 + depth;
   }
   toString(indent = '—') {
     return (
@@ -28,33 +37,37 @@ class Hierarchy {
 
 // prettier-ignore
 const h = new Hierarchy(null, 
-  //new Hierarchy('1'),
-  //new Hierarchy('2', 
+  new Hierarchy('1'),
+  new Hierarchy('2', 
     new Hierarchy('3', 
       new Hierarchy('4'), 
       new Hierarchy('5')), 
     new Hierarchy('6')
-  //), 
-  //new Hierarchy('7', 
-  	//new Hierarchy('8', 
-      //new Hierarchy('9')
-    //),
-    //new Hierarchy('A')
-  //)
+  ), 
+  new Hierarchy('7', 
+  	new Hierarchy('8', 
+      new Hierarchy('9')
+    ),
+    new Hierarchy('A')
+  ),
+  new Hierarchy('B')
 );
 
-function renderHierarchy(children) {
-  const next = [];
+function renderHierarchy(hierarchy) {
+  // Place holder of temporary hierarchy
+  const next = new Hierarchy(null);
   let row = '';
-  if (!children || 0 === children.length) return '';
-  for (const node of children) {
-    row += `<th colspan="${node.leaves()}">${
-      node.label
-    } (${node.leaves()})</th>`;
-    next.push(...node.children);
+  if (0 === hierarchy.children.length) return '';
+  for (const node of hierarchy.children) {
+    row += `<th colspan="${node.leaves()}" rowspan="${
+      node.hasChildren ? 1 : hierarchy.depth()
+    }">${node.label}<!--(${node.leaves()}, ${
+      node.hasChildren ? 1 : hierarchy.depth()
+    })--></th>`;
+    next.children.push(...node.children);
   }
   return `<tr>${row}</tr>` + renderHierarchy(next);
 }
 
 const el = document.querySelector('#dynamic>div');
-el.innerHTML = `<table><thead>${renderHierarchy(h.children)}</thead></table>`;
+el.innerHTML = `<table><thead>${renderHierarchy(h)}</thead></table>`;
