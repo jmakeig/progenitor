@@ -210,12 +210,8 @@ class Hierarchy {
     return this.children.length > 0;
   }
   get depth() {
-    if (this.hasChildren) {
-      return (
-        1 + this.children.reduce((prev, curr) => Math.max(curr.depth, prev), 0)
-      );
-    }
-    return 1;
+    const max = (prev, curr) => Math.max(curr.depth, prev);
+    return 1 + (this.hasChildren ? this.children.reduce(max, 0) : 0);
   }
   toString(indent = '—') {
     return (
