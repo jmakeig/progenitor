@@ -3,20 +3,20 @@ class Hierarchy {
     this.label = label;
     this.children = children || [];
   }
-  leaves() {
+  get leaves() {
     if (0 === this.children.length) {
       return 1;
     }
-    return this.children.reduce((prev, curr) => prev + curr.leaves(), 0);
+    return this.children.reduce((prev, curr) => prev + curr.leaves, 0);
   }
   get hasChildren() {
     return this.children.length > 0;
   }
-  depth() {
+  get depth() {
     let depth = 0;
     if (this.hasChildren) {
       this.children.forEach(node => {
-        let tmpDepth = node.depth();
+        let tmpDepth = node.depth;
         if (tmpDepth > depth) {
           depth = tmpDepth;
         }
@@ -33,6 +33,9 @@ class Hierarchy {
       )
     );
   }
+}
+Hierarchy.from = function from(obj) {
+  // TODO
 }
 
 // prettier-ignore
@@ -59,10 +62,10 @@ function renderHierarchy(hierarchy) {
   let row = '';
   if (0 === hierarchy.children.length) return '';
   for (const node of hierarchy.children) {
-    row += `<th colspan="${node.leaves()}" rowspan="${
-      node.hasChildren ? 1 : hierarchy.depth()
-    }">${node.label}<!--(${node.leaves()}, ${
-      node.hasChildren ? 1 : hierarchy.depth()
+    row += `<th colspan="${node.leaves}" rowspan="${
+      node.hasChildren ? 1 : hierarchy.depth
+    }">${node.label}<!--(${node.leaves}, ${
+      node.hasChildren ? 1 : hierarchy.depth
     })--></th>`;
     next.children.push(...node.children);
   }
@@ -71,3 +74,4 @@ function renderHierarchy(hierarchy) {
 
 const el = document.querySelector('#dynamic>div');
 el.innerHTML = `<table><thead>${renderHierarchy(h)}</thead></table>`;
+
