@@ -13,10 +13,10 @@ class Hierarchy {
     return this.children.length > 0;
   }
   depth() {
-    var depth = 0;
-    if (this.children) {
-      this.children.forEach(function(d) {
-        let tmpDepth = d.depth();
+    let depth = 0;
+    if (this.hasChildren) {
+      this.children.forEach(node => {
+        let tmpDepth = node.depth();
         if (tmpDepth > depth) {
           depth = tmpDepth;
         }
