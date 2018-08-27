@@ -195,20 +195,32 @@ function replaceChildren(oldNode, newChild) {
 }
 /*******************/
 
+/**
+ * A tree data structure. Each node as a label and an ordered list of
+ * `Hierarchy` children.
+ */
 class Hierarchy {
   constructor(label, ...children) {
     this.label = label;
     this.children = children || [];
   }
+  /**
+   * The total number of *leaf nodes* underneath the current node.
+   * This is useful for colspan on vertically-oriented hierarchies.
+   */
   get leaves() {
-    if (0 === this.children.length) {
-      return 1;
+    if (this.hasChildren) {
+      return this.children.reduce((prev, curr) => prev + curr.leaves, 0);
     }
-    return this.children.reduce((prev, curr) => prev + curr.leaves, 0);
+    return 1;
   }
   get hasChildren() {
     return this.children.length > 0;
   }
+  /**
+   * The *maximum depth* under the current node. This is useful for rowspan in
+   * vertically-oriented hierarchies.
+   */
   get depth() {
     const max = (prev, curr) => Math.max(curr.depth, prev);
     return 1 + (this.hasChildren ? this.children.reduce(max, 0) : 0);
@@ -223,6 +235,14 @@ class Hierarchy {
     );
   }
 }
+/**
+ * Converts a dictionary-style `Object` into a `Hierarchy`, using the object’s
+ * ennumerable properties.
+ *
+ * @param {*} obj
+ * @return {Hierarchy}
+ * @static
+ */
 Hierarchy.from = function from(obj) {
   // TODO
 };
@@ -256,14 +276,6 @@ function renderHierarchy(hierarchy) {
   // Place holder of temporary hierarchy
   const next = new Hierarchy(null);
   if (0 === hierarchy.children.length) return '';
-  /* for (const node of hierarchy.children) {
-    row += `<th colspan="${node.leaves}" rowspan="${
-      node.hasChildren ? 1 : hierarchy.depth
-    }">${node.label}<!--(${node.leaves}, ${
-      node.hasChildren ? 1 : hierarchy.depth
-    })--></th>`;
-    next.children.push(...node.children);
-  } */
   const rows = hierarchy.children.map(node => {
     next.children.push(...node.children);
     return th(node.label, {
