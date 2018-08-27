@@ -210,16 +210,12 @@ class Hierarchy {
     return this.children.length > 0;
   }
   get depth() {
-    let depth = 0;
     if (this.hasChildren) {
-      this.children.forEach(node => {
-        let tmpDepth = node.depth;
-        if (tmpDepth > depth) {
-          depth = tmpDepth;
-        }
-      });
+      return (
+        1 + this.children.reduce((prev, curr) => Math.max(curr.depth, prev), 0)
+      );
     }
-    return 1 + depth;
+    return 1;
   }
   toString(indent = '—') {
     return (
@@ -250,7 +246,14 @@ const h = new Hierarchy(null,
     ),
     new Hierarchy('A')
   ),
-  new Hierarchy('B')
+  new Hierarchy('B', 
+    new Hierarchy('C', 
+    new Hierarchy('D'), 
+      new Hierarchy('E', 
+        new Hierarchy('F')
+      )
+    )
+  )
 );
 
 function renderHierarchy(hierarchy) {
