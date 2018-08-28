@@ -200,6 +200,11 @@ function replaceChildren(oldNode, newChild) {
  * `Hierarchy` children.
  */
 class Hierarchy {
+  /**
+   *
+   * @param {Object} data
+   * @param  {...Hierarchy} children
+   */
   constructor(data, ...children) {
     this.data = data;
     this.children = children || [];
