@@ -200,8 +200,8 @@ function replaceChildren(oldNode, newChild) {
  * `Hierarchy` children.
  */
 class Hierarchy {
-  constructor(label, ...children) {
-    this.label = label;
+  constructor(data, ...children) {
+    this.data = data;
     this.children = children || [];
   }
   /**
@@ -240,13 +240,13 @@ class Hierarchy {
     })(this);
   }
   toString(indent = '—') {
-    return (
-      this.val +
-      this.children.reduce(
-        (prev, curr) => prev + '\n' + curr.toString(indent + indent[0]),
-        ''
-      )
-    );
+    return this.data && this.data.label
+      ? this.data.label
+      : String(this.data) +
+          this.children.reduce(
+            (prev, curr) => prev + '\n' + curr.toString(indent + indent[0]),
+            ''
+          );
   }
 }
 /**
@@ -263,41 +263,41 @@ Hierarchy.from = function from(obj) {
 
 // prettier-ignore
 const h = new Hierarchy(null, 
-  new Hierarchy('1'),
-  new Hierarchy('2', 
-    new Hierarchy('3', 
-      new Hierarchy('4'), 
-      new Hierarchy('5')), 
-    new Hierarchy('6')
+  new Hierarchy({ label: '1' }),
+  new Hierarchy({ label: '2' }, 
+    new Hierarchy({ label: '3' }, 
+      new Hierarchy({ label: '4' }), 
+      new Hierarchy({ label: '5' })), 
+    new Hierarchy({ label: '6' })
   ), 
-  new Hierarchy('7', 
-  	new Hierarchy('8', 
-      new Hierarchy('9')
+  new Hierarchy({ label: '7' }, 
+  	new Hierarchy({ label: '8' }, 
+      new Hierarchy({ label: '9' })
     ),
-    new Hierarchy('A')
+    new Hierarchy({ label: 'A' })
   ),
-  new Hierarchy('B')
+  new Hierarchy({ label: 'B' })
 );
 /*
 const h = new Hierarchy(null, 
-  new Hierarchy('1'),
-  new Hierarchy('2', 
-    new Hierarchy('3', 
-      new Hierarchy('4'), 
-      new Hierarchy('5')), 
-    new Hierarchy('6')
+  new Hierarchy({ label: '1' }),
+  new Hierarchy({ label: '2' }, 
+    new Hierarchy({ label: '3' }, 
+      new Hierarchy({ label: '4' }), 
+      new Hierarchy({ label: '5' })), 
+    new Hierarchy({ label: '6' })
   ), 
-  new Hierarchy('7', 
-  	new Hierarchy('8', 
-      new Hierarchy('9')
+  new Hierarchy({ label: '7' }, 
+  	new Hierarchy({ label: '8' }, 
+      new Hierarchy({ label: '9' })
     ),
-    new Hierarchy('A')
+    new Hierarchy({ label: 'A' })
   ),
-  new Hierarchy('B', 
-    new Hierarchy('C', 
-    new Hierarchy('D'), 
-      new Hierarchy('E', 
-        new Hierarchy('F')
+  new Hierarchy({ label: 'B' }, 
+    new Hierarchy({ label: 'C' }, 
+    new Hierarchy({ label: 'D' }), 
+      new Hierarchy({ label: 'E' }, 
+        new Hierarchy({ label: 'F' })
       )
     )
   )
@@ -310,7 +310,7 @@ function renderVerticalHierarchy(hierarchy) {
   const rows = hierarchy.children.map(node => {
     next.children.push(...node.children);
     const leaves = node.leaves;
-    return th(node.label, {
+    return th(node.data.label, {
       scope: node.hasChildren ? 'colgroup' : 'col',
       colSpan: leaves,
       rowSpan: node.hasChildren ? 1 : hierarchy.depth
@@ -323,14 +323,14 @@ function renderHorizontalHierarchy(hierarchy) {
   let accum = [];
   const rows = [];
   hierarchy.traverse((node, parent) => {
-    console.log(node, parent, node.depth);
-    if (null === node.label) return;
+    // console.log(node, parent, node.depth);
+    if (null === node.data) return;
     const prop = {
       scope: !node.hasChildren ? 'row' : 'rowgroup',
       rowSpan: node.leaves,
       colSpan: parent.depth - node.depth
     };
-    accum.push(th(node.label, prop));
+    accum.push(th(node.data.label, prop));
     if (!node.hasChildren) {
       rows.push(accum);
       accum = [];
@@ -340,7 +340,7 @@ function renderHorizontalHierarchy(hierarchy) {
 }
 
 const el = document.querySelector('#dynamic>div');
-// h.traverse(node => console.log(node.label));
+// h.traverse(node => console.log(node.data.label));
 
 el.appendChild(table(thead(renderHorizontalHierarchy(h))));
 el.appendChild(table(thead(renderVerticalHierarchy(h))));
