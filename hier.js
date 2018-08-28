@@ -323,7 +323,7 @@ function renderHorizontalHierarchy(hierarchy) {
   let accum = [];
   const rows = [];
   hierarchy.traverse((node, parent) => {
-    // console.log(node, parent, node.depth);
+    console.log(node, parent, node.depth);
     if (null === node.label) return;
     const prop = {
       scope: !node.hasChildren ? 'row' : 'rowgroup',
@@ -341,5 +341,6 @@ function renderHorizontalHierarchy(hierarchy) {
 
 const el = document.querySelector('#dynamic>div');
 // h.traverse(node => console.log(node.label));
-el.appendChild(table(thead(renderVerticalHierarchy(h))));
+
 el.appendChild(table(thead(renderHorizontalHierarchy(h))));
+el.appendChild(table(thead(renderVerticalHierarchy(h))));
