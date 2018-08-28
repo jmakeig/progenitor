@@ -326,7 +326,7 @@ function renderHorizontalHierarchy(hierarchy) {
     // console.log(node, parent, node.depth);
     if (null === node.data) return;
     const prop = {
-      scope: !node.hasChildren ? 'row' : 'rowgroup',
+      scope: node.hasChildren ? 'rowgroup' : 'row',
       rowSpan: node.leaves,
       colSpan: parent.depth - node.depth
     };
