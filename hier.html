@@ -1,0 +1,76 @@
+<section id="dynamic">
+  <h2>Dynamic</h2>
+  <div></div>
+</section>
+<section id="static">
+  <h2>Static</h2>
+  <pre>const h = new Hierarchy(null, 
+  new Hierarchy('1'),       // leaf
+  new Hierarchy('2', 
+    new Hierarchy('3', 
+      new Hierarchy('4'),   // leaf
+      new Hierarchy('5')),  // leaf
+    new Hierarchy('6')      // leaf
+  ), 
+  new Hierarchy('7', 
+    new Hierarchy('8', 
+      new Hierarchy('9')    // leaf
+    ),
+    new Hierarchy('A')      // leaf
+  ),
+  new Hierarchy('B')        // leaf
+);</pre>
+  <div>
+    <h3>Row-Oriented</h3>
+    <table>
+      <tr>
+        <th scope="row" colspan="3">1</th>
+      </tr>
+      <tr>
+        <th scope="rowgroup" rowspan="3">2</th>
+        <th scope="rowgroup" rowspan="2">3</th>
+        <th scope="row">4</th>
+      </tr>
+      <tr>
+        <th scope="row">5</th>
+      </tr>
+      <tr>
+        <th scope="row" colspan="2">6</th>
+      </tr>
+      <tr>
+        <th scope="rowgroup" rowspan="2">7</th>
+        <th scope="row">8</th>
+        <th scope="row">9</th>
+      </tr>
+      <tr>
+        <th scope="row" colspan="2">A</th>
+      </tr>
+      <tr>
+        <th scope="row" colspan="3">B</th>
+      </tr>
+    </table>
+
+    <h3>Column-Oriented</h3>
+    <table>
+      <thead>
+        <tr>
+          <th scope="colgroup" rowspan="3">1</th>
+          <th scope="colgroup" colspan="3">2</th>
+          <th scope="colgroup" colspan="2">7</th>
+          <th scope="col" rowspan="3">B</th>
+        </tr>
+        <tr>
+          <th scope="colgroup" colspan="2">3</th>
+          <th scope="col" rowspan="2">6</th>
+          <th scope="col">8</th>
+          <th scope="col" rowspan="2">A</th>
+        </tr>
+        <tr>
+          <th scope="col">4</th>
+          <th scope="col">5</th>
+          <th scope="col">9</th>
+        </tr>
+      </thead>
+    </table>
+  </div>
+</section>

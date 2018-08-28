@@ -1,0 +1,40 @@
+body {
+  font-family: Helvetica, sans-serif;
+}
+table {
+  margin: 1em 0;
+
+  border-collapse: collapse;
+}
+th,
+td {
+  padding: 0.5em;
+
+  border: solid 1px #ccc;
+}
+th,
+th[scope='colgroup'],
+th[scope='col'] {
+  text-align: center;
+  vertical-align: top;
+}
+th[scope='rowgroup'],
+th[scope='row'] {
+  text-align: left;
+}
+th[scope='colgroup'],
+th[scope='rowgroup'] {
+  background: orange;
+}
+th:not([scope]) {
+  background: red;
+}
+pre {
+  padding: 0.25em 0.5em;
+
+  border: solid 0.5px green;
+
+  font-family: 'SF Mono', 'Inconsolata', 'Consolas', monospace;
+  font-size: 0.65em;
+  line-height: 1.55;
+}
