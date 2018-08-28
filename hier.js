@@ -225,6 +225,20 @@ class Hierarchy {
     const max = (prev, curr) => Math.max(curr.depth, prev);
     return 1 + (this.hasChildren ? this.children.reduce(max, 0) : 0);
   }
+  /**
+   * Depth-first traversal
+   *
+   * @param {Function} callback
+   * @return {undefined}
+   */
+  traverse(callback) {
+    (function recurse(node, parent) {
+      callback(node, parent);
+      for (const child of node.children) {
+        recurse(child, node);
+      }
+    })(this);
+  }
   toString(indent = '—') {
     return (
       this.val +
@@ -262,6 +276,23 @@ const h = new Hierarchy(null,
     ),
     new Hierarchy('A')
   ),
+  new Hierarchy('B')
+);
+/*
+const h = new Hierarchy(null, 
+  new Hierarchy('1'),
+  new Hierarchy('2', 
+    new Hierarchy('3', 
+      new Hierarchy('4'), 
+      new Hierarchy('5')), 
+    new Hierarchy('6')
+  ), 
+  new Hierarchy('7', 
+  	new Hierarchy('8', 
+      new Hierarchy('9')
+    ),
+    new Hierarchy('A')
+  ),
   new Hierarchy('B', 
     new Hierarchy('C', 
     new Hierarchy('D'), 
@@ -271,20 +302,44 @@ const h = new Hierarchy(null,
     )
   )
 );
-
-function renderHierarchy(hierarchy) {
+*/
+function renderVerticalHierarchy(hierarchy) {
   // Place holder of temporary hierarchy
   const next = new Hierarchy(null);
-  if (0 === hierarchy.children.length) return '';
+  if (0 === hierarchy.children.length) return empty();
   const rows = hierarchy.children.map(node => {
     next.children.push(...node.children);
+    const leaves = node.leaves;
     return th(node.label, {
-      colSpan: node.leaves,
+      scope: node.hasChildren ? 'colgroup' : 'col',
+      colSpan: leaves,
       rowSpan: node.hasChildren ? 1 : hierarchy.depth
     });
   });
-  return toFragment(tr(rows), renderHierarchy(next));
+  return toFragment(tr(rows), renderVerticalHierarchy(next));
+}
+
+function renderHorizontalHierarchy(hierarchy) {
+  let accum = [];
+  const rows = [];
+  hierarchy.traverse((node, parent) => {
+    // console.log(node, parent, node.depth);
+    if (null === node.label) return;
+    const prop = {
+      scope: !node.hasChildren ? 'row' : 'rowgroup',
+      rowSpan: node.leaves,
+      colSpan: parent.depth - node.depth
+    };
+    accum.push(th(node.label, prop));
+    if (!node.hasChildren) {
+      rows.push(accum);
+      accum = [];
+    }
+  });
+  return rows.map(r => tr(r));
 }
 
 const el = document.querySelector('#dynamic>div');
-el.appendChild(table(thead(renderHierarchy(h))));
+// h.traverse(node => console.log(node.label));
+el.appendChild(table(thead(renderVerticalHierarchy(h))));
+el.appendChild(table(thead(renderHorizontalHierarchy(h))));
