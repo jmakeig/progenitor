@@ -1,16 +1,17 @@
 {
-  "name": "pm-plan",
+  "name": "progenitor",
   "version": "0.1.0",
-  "description": "",
+  "description": "An experiment in collaborative, multi-dimensional idea scoring in the browser.",
   "main": "index.js",
   "scripts": {
     "build": "rollup -c",
+    "watch": "rollup -c --watch",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "caddy -conf ./Caddyfile -root ./experimentation"
   },
   "keywords": [],
   "author": "Justin Makeig <jmpublic+github@makeig.com> (https://github.com/jmakeig)",
-  "license": "Apache-2.0",
+  "license": "none",
   "devDependencies": {
     "@babel/core": "^7.0.0",
     "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
