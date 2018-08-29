@@ -1,4 +1,4 @@
-import { table, thead, tr, th, toFragment, empty } from 'dom-helper';
+import { table, thead, tbody, tr, th, toFragment, empty } from 'dom-helper';
 /**
  * A tree data structure. Each node as a label and an ordered list of
  * `Hierarchy` children.
@@ -112,23 +112,34 @@ const h = new Hierarchy(null,
   )
 );
 */
-function renderVerticalHierarchy(hierarchy) {
+function renderColumnHeaders(hierarchy, spacer) {
   // Place holder of temporary hierarchy
   const next = new Hierarchy(null);
   if (0 === hierarchy.children.length) return empty();
-  const rows = hierarchy.children.map(node => {
+  const rows = hierarchy.children.map((node, i) => {
     next.children.push(...node.children);
     const leaves = node.leaves;
-    return th(node.data.label, {
+    const header = th(node.data.label, {
       scope: node.hasChildren ? 'colgroup' : 'col',
       colSpan: leaves,
       rowSpan: node.hasChildren ? 1 : hierarchy.depth
     });
+    if (spacer && 0 === i) {
+      return toFragment(
+        th({
+          className: 'spacer',
+          colSpan: spacer.colSpan,
+          rowSpan: spacer.rowSpan
+        }),
+        header
+      );
+    }
+    return header;
   });
-  return toFragment(tr(rows), renderVerticalHierarchy(next));
+  return toFragment(tr(rows), renderColumnHeaders(next));
 }
 
-function renderHorizontalHierarchy(hierarchy) {
+function renderRowHeaders(hierarchy) {
   let accum = [];
   const rows = [];
   hierarchy.traverse((node, parent) => {
@@ -151,5 +162,9 @@ function renderHorizontalHierarchy(hierarchy) {
 const el = document.querySelector('#dynamic>div');
 // h.traverse(node => console.log(node.data.label));
 
-el.appendChild(table(thead(renderHorizontalHierarchy(h))));
-el.appendChild(table(thead(renderVerticalHierarchy(h))));
+el.appendChild(
+  table(
+    thead(renderColumnHeaders(h, { colSpan: 3, rowSpan: 3 })),
+    tbody(renderRowHeaders(h))
+  )
+);

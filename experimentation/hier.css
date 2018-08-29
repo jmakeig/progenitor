@@ -26,7 +26,10 @@ th[scope='colgroup'],
 th[scope='rowgroup'] {
   background: orange;
 }
-th:not([scope]) {
+th.spacer {
+  background: #ccc;
+}
+th:not([scope]):not(.spacer) {
   background: red;
 }
 pre {
