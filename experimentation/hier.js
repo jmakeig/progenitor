@@ -1,81 +1,11 @@
 import { table, thead, tbody, tr, th, td, toFragment, empty } from 'dom-helper';
-/**
- * A tree data structure. Each node as a label and an ordered list of
- * `Hierarchy` children.
- */
-class Hierarchy {
-  /**
-   *
-   * @param {Object} data
-   * @param  {...Hierarchy} children
-   */
-  constructor(data, ...children) {
-    this.data = data;
-    this.children = children || [];
-  }
-}
-
-function hasChildren(hierarchy) {
-  return hierarchy.children && hierarchy.children.length > 0;
-}
-/**
- * Depth-first traversal
- *
- * @param {Function} callback
- * @return {undefined}
- */
-function traverseDepthFirst(hierarchy, callback) {
-  (function recurse(node, parent) {
-    callback(node, parent);
-    for (const child of node.children) {
-      recurse(child, node);
-    }
-  })(hierarchy);
-}
-function descendents(hierarchy, predicate = node => node) {
-  const accum = [];
-  traverseDepthFirst(hierarchy, node => accum.push(node));
-  return accum;
-}
-/**
- * The total number of *leaf nodes* underneath the current node.
- * This is useful for colspan on vertically-oriented hierarchies.
- *
- * @param {Hierarchy} hierarchy
- * @return {number}
- */
-function countDescendentLeaves(hierarchy) {
-  if (hasChildren(hierarchy)) {
-    return hierarchy.children.reduce(
-      (prev, curr) => prev + countDescendentLeaves(curr),
-      0
-    );
-  }
-  return 1;
-}
-/**
- * The *maximum depth* under the current node. This is useful for rowspan in
- * vertically-oriented hierarchies.
- *
- * @param {Hierarchy} hierarchy
- * @return {number}
- */
-function maxDepth(hierarchy) {
-  const max = (prev, curr) => Math.max(maxDepth(curr), prev);
-  return 1 + (hasChildren(hierarchy) ? hierarchy.children.reduce(max, 0) : 0);
-}
-
-/**
- * Converts a dictionary-style `Object` into a `Hierarchy`, using the object’s
- * ennumerable properties.
- *
- * @param {*} obj
- * @return {Hierarchy}
- * @static
- */
-Hierarchy.from = function from(obj) {
-  // TODO
-};
+import {
+  Hierarchy,
+  hasChildren,
+  maxDepth,
+  traverseDepthFirst,
+  countDescendentLeaves
+} from './hierarchy.js';
 
 // prettier-ignore
 const columns = new Hierarchy(null, 
