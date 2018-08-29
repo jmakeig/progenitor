@@ -1,4 +1,4 @@
-import { table, thead, tbody, tr, th, toFragment, empty } from 'dom-helper';
+import { table, thead, tbody, tr, th, td, toFragment, empty } from 'dom-helper';
 /**
  * A tree data structure. Each node as a label and an ordered list of
  * `Hierarchy` children.
@@ -71,24 +71,25 @@ Hierarchy.from = function from(obj) {
 };
 
 // prettier-ignore
-const h = new Hierarchy(null, 
-  new Hierarchy({ label: '1' }),
-  new Hierarchy({ label: '2' }, 
-    new Hierarchy({ label: '3' }, 
-      new Hierarchy({ label: '4' }), 
-      new Hierarchy({ label: '5' })), 
-    new Hierarchy({ label: '6' })
+const columns = new Hierarchy(null, 
+  new Hierarchy({ label: 'Things' }),
+  new Hierarchy({ label: 'Stuff' }, 
+    new Hierarchy({ label: 'Others' }, 
+      new Hierarchy({ label: 'Misc.' }), 
+      new Hierarchy({ label: 'Various' })), 
+    new Hierarchy({ label: 'These' })
   ), 
-  new Hierarchy({ label: '7' }, 
-  	new Hierarchy({ label: '8' }, 
-      new Hierarchy({ label: '9' })
+  new Hierarchy({ label: 'Those' }, 
+  	new Hierarchy({ label: 'What’s it?' }, 
+      new Hierarchy({ label: 'That' })
     ),
-    new Hierarchy({ label: 'A' })
+    new Hierarchy({ label: 'Him' })
   ),
-  new Hierarchy({ label: 'B' })
+  new Hierarchy({ label: 'Her' })
 );
-/*
-const h = new Hierarchy(null, 
+
+// prettier-ignore
+const rows = new Hierarchy(null, 
   new Hierarchy({ label: '1' }),
   new Hierarchy({ label: '2' }, 
     new Hierarchy({ label: '3' }, 
@@ -111,7 +112,27 @@ const h = new Hierarchy(null,
     )
   )
 );
-*/
+
+// prettier-ignore
+const values = [
+  ['A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6'],
+  ['B0', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6'],
+  ['C0', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6'],
+  ['D0', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6'],
+  ['E0', 'E1', 'E2', 'E3', 'E4', 'E5', 'E6'],
+  ['F0', 'F1', 'F2', 'F3', 'F4', 'F5', 'F6'],
+  ['G0', 'G1', 'G2', 'G3', 'G4', 'G5', 'G6'],
+  ['H0', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6'],
+];
+
+/**
+ * Renders column headers as rows with an optional spacer
+ * to make room for the row headers.
+ *
+ * @param {Hierarchy} hierarchy
+ * @param {Object} spacer `{ colSpan: #, rowSpan: # }`
+ * @return {DocumentFragment}
+ */
 function renderColumnHeaders(hierarchy, spacer) {
   // Place holder of temporary hierarchy
   const next = new Hierarchy(null);
@@ -139,8 +160,17 @@ function renderColumnHeaders(hierarchy, spacer) {
   return toFragment(tr(rows), renderColumnHeaders(next));
 }
 
-function renderRowHeaders(hierarchy) {
+/**
+ * Renders row headers, optionally appending the cell values for
+ * each of the leaf rows.
+ *
+ * @param {Hierarchy} hierarchy
+ * @param {Array<Array<Object>>} [values]
+ * @return {Array<HTMLTableRowElement>}
+ */
+function renderRowHeaders(hierarchy, values) {
   let accum = [];
+  let index = 0;
   const rows = [];
   hierarchy.traverse((node, parent) => {
     // console.log(node, parent, node.depth);
@@ -152,6 +182,10 @@ function renderRowHeaders(hierarchy) {
     };
     accum.push(th(node.data.label, prop));
     if (!node.hasChildren) {
+      // Append the values as table cells for each row
+      if (values) {
+        accum.push(...values[index++].map(value => td(value)));
+      }
       rows.push(accum);
       accum = [];
     }
@@ -159,12 +193,25 @@ function renderRowHeaders(hierarchy) {
   return rows.map(r => tr(r));
 }
 
+/**
+ *
+ * @param {Hierarchy} columns
+ * @param {Hierarchy} rows
+ * @param {Array<Array<Object>>} values
+ */
+function renderTable(columns, rows, values) {
+  return table(
+    thead(
+      renderColumnHeaders(columns, {
+        colSpan: columns.depth,
+        rowSpan: rows.depth
+      })
+    ),
+    tbody(renderRowHeaders(rows, values))
+  );
+}
+
 const el = document.querySelector('#dynamic>div');
 // h.traverse(node => console.log(node.data.label));
 
-el.appendChild(
-  table(
-    thead(renderColumnHeaders(h, { colSpan: 3, rowSpan: 3 })),
-    tbody(renderRowHeaders(h))
-  )
-);
+el.appendChild(renderTable(columns, rows, values));
