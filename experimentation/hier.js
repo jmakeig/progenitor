@@ -13,51 +13,58 @@ class Hierarchy {
     this.data = data;
     this.children = children || [];
   }
-  /**
-   * The total number of *leaf nodes* underneath the current node.
-   * This is useful for colspan on vertically-oriented hierarchies.
-   */
-  get leaves() {
-    if (this.hasChildren) {
-      return this.children.reduce((prev, curr) => prev + curr.leaves, 0);
-    }
-    return 1;
-  }
-  get hasChildren() {
-    return this.children.length > 0;
-  }
-  /**
-   * The *maximum depth* under the current node. This is useful for rowspan in
-   * vertically-oriented hierarchies.
-   */
-  get depth() {
-    const max = (prev, curr) => Math.max(curr.depth, prev);
-    return 1 + (this.hasChildren ? this.children.reduce(max, 0) : 0);
-  }
-  /**
-   * Depth-first traversal
-   *
-   * @param {Function} callback
-   * @return {undefined}
-   */
-  traverse(callback) {
-    (function recurse(node, parent) {
-      callback(node, parent);
-      for (const child of node.children) {
-        recurse(child, node);
-      }
-    })(this);
-  }
-  toString(indent = '—') {
-    return this.data && this.data.label
-      ? this.data.label
-      : String(this.data) +
-          this.children.reduce(
-            (prev, curr) => prev + '\n' + curr.toString(indent + indent[0]),
-            ''
-          );
-  }
 }
+
+function hasChildren(hierarchy) {
+  return hierarchy.children && hierarchy.children.length > 0;
+}
+/**
+ * Depth-first traversal
+ *
+ * @param {Function} callback
+ * @return {undefined}
+ */
+function traverseDepthFirst(hierarchy, callback) {
+  (function recurse(node, parent) {
+    callback(node, parent);
+    for (const child of node.children) {
+      recurse(child, node);
+    }
+  })(hierarchy);
+}
+function descendents(hierarchy, predicate = node => node) {
+  const accum = [];
+  traverseDepthFirst(hierarchy, node => accum.push(node));
+  return accum;
+}
+/**
+ * The total number of *leaf nodes* underneath the current node.
+ * This is useful for colspan on vertically-oriented hierarchies.
+ *
+ * @param {Hierarchy} hierarchy
+ * @return {number}
+ */
+function countDescendentLeaves(hierarchy) {
+  if (hasChildren(hierarchy)) {
+    return hierarchy.children.reduce(
+      (prev, curr) => prev + countDescendentLeaves(curr),
+      0
+    );
+  }
+  return 1;
+}
+/**
+ * The *maximum depth* under the current node. This is useful for rowspan in
+ * vertically-oriented hierarchies.
+ *
+ * @param {Hierarchy} hierarchy
+ * @return {number}
+ */
+function maxDepth(hierarchy) {
+  const max = (prev, curr) => Math.max(maxDepth(curr), prev);
+  return 1 + (hasChildren(hierarchy) ? hierarchy.children.reduce(max, 0) : 0);
+}
+
 /**
  * Converts a dictionary-style `Object` into a `Hierarchy`, using the object’s
  * ennumerable properties.
@@ -74,10 +81,10 @@ Hierarchy.from = function from(obj) {
 const columns = new Hierarchy(null, 
   new Hierarchy({ label: 'Things' }),
   new Hierarchy({ label: 'Stuff' }, 
+  new Hierarchy({ label: 'These' }),
     new Hierarchy({ label: 'Others' }, 
       new Hierarchy({ label: 'Misc.' }), 
-      new Hierarchy({ label: 'Various' })), 
-    new Hierarchy({ label: 'These' })
+      new Hierarchy({ label: 'Various' })) 
   ), 
   new Hierarchy({ label: 'Those' }, 
   	new Hierarchy({ label: 'What’s it?' }, 
@@ -139,11 +146,11 @@ function renderColumnHeaders(hierarchy, spacer) {
   if (0 === hierarchy.children.length) return empty();
   const rows = hierarchy.children.map((node, i) => {
     next.children.push(...node.children);
-    const leaves = node.leaves;
+    const leaves = countDescendentLeaves(node);
     const header = th(node.data.label, {
-      scope: node.hasChildren ? 'colgroup' : 'col',
+      scope: hasChildren(node) ? 'colgroup' : 'col',
       colSpan: leaves,
-      rowSpan: node.hasChildren ? 1 : hierarchy.depth
+      rowSpan: hasChildren(node) ? 1 : maxDepth(hierarchy)
     });
     if (spacer && 0 === i) {
       return toFragment(
@@ -172,18 +179,20 @@ function renderRowHeaders(hierarchy, values) {
   let accum = [];
   let index = 0;
   const rows = [];
-  hierarchy.traverse((node, parent) => {
-    // console.log(node, parent, node.depth);
+  traverseDepthFirst(hierarchy, (node, parent) => {
     if (null === node.data) return;
     const prop = {
-      scope: node.hasChildren ? 'rowgroup' : 'row',
-      rowSpan: node.leaves,
-      colSpan: parent.depth - node.depth
+      scope: hasChildren(node) ? 'rowgroup' : 'row',
+      rowSpan: countDescendentLeaves(node),
+      colSpan: maxDepth(parent) - maxDepth(node)
     };
     accum.push(th(node.data.label, prop));
-    if (!node.hasChildren) {
+    if (!hasChildren(node)) {
       // Append the values as table cells for each row
       if (values) {
+        // TODO: ARIA accessiblity
+        //       * <https://www.w3.org/WAI/tutorials/tables/multi-level/>
+        //       * <https://developer.mozilla.org/en-US/docs/Web/HTML/Element/th#attr-headers>
         accum.push(...values[index++].map(value => td(value)));
       }
       rows.push(accum);
@@ -203,8 +212,8 @@ function renderTable(columns, rows, values) {
   return table(
     thead(
       renderColumnHeaders(columns, {
-        colSpan: columns.depth,
-        rowSpan: rows.depth
+        colSpan: maxDepth(columns),
+        rowSpan: maxDepth(rows)
       })
     ),
     tbody(renderRowHeaders(rows, values))
