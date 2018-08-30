@@ -38,9 +38,11 @@ export function traverseDepthFirst(hierarchy, callback) {
     }
   })(hierarchy);
 }
-export function descendents(hierarchy, predicate = node => node) {
+export function descendants(hierarchy, predicate = node => true) {
   const accum = [];
-  traverseDepthFirst(hierarchy, node => accum.push(node));
+  traverseDepthFirst(hierarchy, node => {
+    if (predicate(node)) accum.push(node);
+  });
   return accum;
 }
 /**
@@ -50,14 +52,15 @@ export function descendents(hierarchy, predicate = node => node) {
  * @param {Hierarchy} hierarchy
  * @return {number}
  */
-export function countDescendentLeaves(hierarchy) {
-  if (hasChildren(hierarchy)) {
-    return hierarchy.children.reduce(
-      (prev, curr) => prev + countDescendentLeaves(curr),
-      0
-    );
-  }
-  return 1;
+export function countDescendantLeaves(hierarchy) {
+  // if (hasChildren(hierarchy)) {
+  //   return hierarchy.children.reduce(
+  //     (prev, curr) => prev + countDescendantLeaves(curr),
+  //     0
+  //   );
+  // }
+  // return 1;
+  return descendants(hierarchy, node => !hasChildren(node)).length;
 }
 /**
  * The *maximum depth* under the current node. This is useful for rowspan in

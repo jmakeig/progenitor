@@ -4,7 +4,7 @@ import {
   hasChildren,
   maxDepth,
   traverseDepthFirst,
-  countDescendentLeaves
+  countDescendantLeaves
 } from './hierarchy.js';
 
 // prettier-ignore
@@ -70,14 +70,14 @@ const values = [
  * @param {Object} spacer `{ colSpan: #, rowSpan: # }`
  * @return {DocumentFragment}
  */
-function renderColumnHeaders(hierarchy, spacer) {
+function renderColumnHeaders(hierarchy, cellRenderer = th, spacer) {
   // Place holder of temporary hierarchy
   const next = new Hierarchy(null);
   if (0 === hierarchy.children.length) return empty();
   const rows = hierarchy.children.map((node, i) => {
     next.children.push(...node.children);
-    const leaves = countDescendentLeaves(node);
-    const header = th(node.data.label, {
+    const leaves = countDescendantLeaves(node);
+    const header = cellRenderer(node.data.label, {
       scope: hasChildren(node) ? 'colgroup' : 'col',
       colSpan: leaves,
       rowSpan: hasChildren(node) ? 1 : maxDepth(hierarchy)
@@ -94,7 +94,7 @@ function renderColumnHeaders(hierarchy, spacer) {
     }
     return header;
   });
-  return toFragment(tr(rows), renderColumnHeaders(next));
+  return toFragment(tr(rows), renderColumnHeaders(next, cellRenderer));
 }
 
 /**
@@ -105,7 +105,12 @@ function renderColumnHeaders(hierarchy, spacer) {
  * @param {Array<Array<Object>>} [values]
  * @return {Array<HTMLTableRowElement>}
  */
-function renderRowHeaders(hierarchy, values) {
+function renderRows(
+  hierarchy,
+  values,
+  cellRenderer = (value, col, row, ...rest) => td(value, ...rest),
+  rowHeaderRenderer = th
+) {
   let accum = [];
   let index = 0;
   const rows = [];
@@ -113,17 +118,22 @@ function renderRowHeaders(hierarchy, values) {
     if (null === node.data) return;
     const prop = {
       scope: hasChildren(node) ? 'rowgroup' : 'row',
-      rowSpan: countDescendentLeaves(node),
+      rowSpan: countDescendantLeaves(node),
       colSpan: maxDepth(parent) - maxDepth(node)
     };
-    accum.push(th(node.data.label, prop));
+    accum.push(rowHeaderRenderer(node.data.label, prop));
+    // Data cells (TD’s) are associated with leaf nodes.
+    // The rest of the row hierarchy is just for bookkeeping in the headers.
     if (!hasChildren(node)) {
       // Append the values as table cells for each row
       if (values) {
         // TODO: ARIA accessiblity
         //       * <https://www.w3.org/WAI/tutorials/tables/multi-level/>
         //       * <https://developer.mozilla.org/en-US/docs/Web/HTML/Element/th#attr-headers>
-        accum.push(...values[index++].map(value => td(value)));
+        accum.push(
+          ...values[index].map((value, c) => cellRenderer(value, c, index))
+        );
+        index++;
       }
       rows.push(accum);
       accum = [];
@@ -139,14 +149,13 @@ function renderRowHeaders(hierarchy, values) {
  * @param {Array<Array<Object>>} values
  */
 function renderTable(columns, rows, values) {
+  const spacer = {
+    colSpan: maxDepth(columns),
+    rowSpan: maxDepth(rows)
+  };
   return table(
-    thead(
-      renderColumnHeaders(columns, {
-        colSpan: maxDepth(columns),
-        rowSpan: maxDepth(rows)
-      })
-    ),
-    tbody(renderRowHeaders(rows, values))
+    thead(renderColumnHeaders(columns, th, spacer)),
+    tbody(renderRows(rows, values, (value, col, row) => td(value)))
   );
 }
 
