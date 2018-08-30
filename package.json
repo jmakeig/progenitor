@@ -17,8 +17,6 @@
   "author": "Justin Makeig <jmpublic+github@makeig.com> (https://github.com/jmakeig)",
   "license": "none",
   "devDependencies": {
-    "@babel/core": "^7.0.0",
-    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
     "dom-helper": "github:jmakeig/dom-helper",
     "jest": "^23.5.0",
     "rollup": "^0.65.0",
