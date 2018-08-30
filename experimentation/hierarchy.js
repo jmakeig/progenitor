@@ -38,10 +38,14 @@ export function traverseDepthFirst(hierarchy, callback) {
     }
   })(hierarchy);
 }
-export function descendants(hierarchy, predicate = node => true) {
+export function descendants(
+  hierarchy,
+  predicate = node => true,
+  project = node => node
+) {
   const accum = [];
   traverseDepthFirst(hierarchy, node => {
-    if (predicate(node)) accum.push(node);
+    if (predicate(node)) accum.push(project(node));
   });
   return accum;
 }

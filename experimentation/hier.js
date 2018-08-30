@@ -2,6 +2,7 @@ import { table, thead, tbody, tr, th, td, toFragment, empty } from 'dom-helper';
 import {
   Hierarchy,
   hasChildren,
+  descendants,
   maxDepth,
   traverseDepthFirst,
   countDescendantLeaves
@@ -11,60 +12,106 @@ import {
 
 // prettier-ignore
 const columns = new Hierarchy(null, 
-  new Hierarchy({ label: 'Things' }),
-  new Hierarchy({ label: 'Stuff' }, 
-  new Hierarchy({ label: 'These' }),
-    new Hierarchy({ label: 'Others' }, 
-      new Hierarchy({ label: 'Misc.' }), 
-      new Hierarchy({ label: 'Various' })) 
+  new Hierarchy({ id: 'Things', label: 'Things' }),
+  new Hierarchy({ id: 'Stuff', label: 'Stuff' }, 
+  new Hierarchy({ id: 'These', label: 'These' }),
+    new Hierarchy({ id: 'Others', label: 'Others' }, 
+      new Hierarchy({ id: 'Misc.', label: 'Misc.' }), 
+      new Hierarchy({ id: 'Various', label: 'Various' })) 
   ), 
-  new Hierarchy({ label: 'Those' }, 
-  	new Hierarchy({ label: 'What’s it?' }, 
-      new Hierarchy({ label: 'That' }, 
-        new Hierarchy({ label: 'More' }, 
-          new Hierarchy({ label: 'Better' })))
+  new Hierarchy({ id: 'Those', label: 'Those' }, 
+  	new Hierarchy({ id: 'What’s it?', label: 'What’s it?' }, 
+      new Hierarchy({ id: 'That', label: 'That' }, 
+        new Hierarchy({ id: 'More', label: 'More' }, 
+          new Hierarchy({ id: 'Better', label: 'Better' })))
     ),
-    new Hierarchy({ label: 'Him' })
+    new Hierarchy({ id: 'Him', label: 'Him' })
   ),
-  new Hierarchy({ label: 'Her' })
+  new Hierarchy({ id: 'Her', label: 'Her' })
 );
 
 // prettier-ignore
 const rows = new Hierarchy(null, 
-  new Hierarchy({ label: '1' }),
-  new Hierarchy({ label: '2' }, 
-    new Hierarchy({ label: '3' }, 
-      new Hierarchy({ label: '4' }), 
-      new Hierarchy({ label: '5' })), 
-    new Hierarchy({ label: '6' })
+  new Hierarchy({ id: '1', label: '1' }),
+  new Hierarchy({ id: '2', label: '2' }, 
+    new Hierarchy({ id: '3', label: '3' }, 
+      new Hierarchy({ id: '4', label: '4' }), 
+      new Hierarchy({ id: '5', label: '5' })), 
+    new Hierarchy({ id: '6', label: '6' })
   ), 
-  new Hierarchy({ label: '7' }, 
-  	new Hierarchy({ label: '8' }, 
-      new Hierarchy({ label: '9' })
+  new Hierarchy({ id: '7', label: '7' }, 
+  	new Hierarchy({ id: '8', label: '8' }, 
+      new Hierarchy({ id: '9', label: '9' })
     ),
-    new Hierarchy({ label: 'A' })
+    new Hierarchy({ id: 'A', label: 'A' })
   ),
-  new Hierarchy({ label: 'B' }, 
-    new Hierarchy({ label: 'C' }, 
-    new Hierarchy({ label: 'D' }), 
-      new Hierarchy({ label: 'E' }, 
-        new Hierarchy({ label: 'F' })
+  new Hierarchy({ id: 'B', label: 'B' }, 
+    new Hierarchy({ id: 'C', label: 'C' }, 
+    new Hierarchy({ id: 'D', label: 'D' }), 
+      new Hierarchy({ id: 'E', label: 'E' }, 
+        new Hierarchy({ id: 'F', label: 'F' })
       )
     )
   )
 );
 
 // prettier-ignore
-const values = [
-  ['A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6'],
-  ['B0', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6'],
-  ['C0', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6'],
-  ['D0', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6'],
-  ['E0', 'E1', 'E2', 'E3', 'E4', 'E5', 'E6'],
-  ['F0', 'F1', 'F2', 'F3', 'F4', 'F5', 'F6'],
-  ['G0', 'G1', 'G2', 'G3', 'G4', 'G5', 'G6'],
-  ['H0', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6'],
+// const values = [
+//   ['A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6'],
+//   ['B0', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6'],
+//   ['C0', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6'],
+//   ['D0', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6'],
+//   ['E0', 'E1', 'E2', 'E3', 'E4', 'E5', 'E6'],
+//   ['F0', 'F1', 'F2', 'F3', 'F4', 'F5', 'F6'],
+//   ['G0', 'G1', 'G2', 'G3', 'G4', 'G5', 'G6'],
+//   ['H0', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6'],
+// ];
+
+const data = [
+  // coord: [col, row]
+  // { coord: ['Things', '1'], value: { label: 'Things 1' } },
+  { coord: ['Things', '4'], value: { label: 'Things 4' } },
+  { coord: ['Things', '5'], value: { label: 'Things 5' } },
+  { coord: ['Things', '6'], value: { label: 'Things 6' } },
+  { coord: ['Things', '9'], value: { label: 'Things 9' } },
+  { coord: ['Things', 'A'], value: { label: 'Things A' } },
+  // { coord: ['Things', 'D'], value: { label: 'Things D' } },
+  { coord: ['Things', 'F'], value: { label: 'Things F' } },
+  { coord: ['These', '1'], value: { label: 'These 1' } },
+  { coord: ['These', '4'], value: { label: 'These 4' } },
+  // { coord: ['These', '5'], value: { label: 'These 5' } },
+  { coord: ['These', '6'], value: { label: 'These 6' } },
+  { coord: ['These', '9'], value: { label: 'These 9' } },
+  // { coord: ['These', 'A'], value: { label: 'These A' } },
+  { coord: ['These', 'D'], value: { label: 'These D' } },
+  // { coord: ['These', 'F'], value: { label: 'These F' } },
+  { coord: ['Misc.', '1'], value: { label: 'Misc. 1' } },
+  { coord: ['Misc.', '4'], value: { label: 'Misc. 4' } },
+  // { coord: ['Misc.', '5'], value: { label: 'Misc. 5' } },
+  { coord: ['Misc.', '6'], value: { label: 'Misc. 6' } },
+  { coord: ['Misc.', '9'], value: { label: 'Misc. 9' } },
+  { coord: ['Misc.', 'A'], value: { label: 'Misc. A' } },
+  { coord: ['Misc.', 'D'], value: { label: 'Misc. D' } },
+  { coord: ['Misc.', 'F'], value: { label: 'Misc. F' } },
 ];
+
+function mapToCells(data, columns, rows) {
+  const id = node => node.data.id;
+  const colIDs = descendants(columns, node => !hasChildren(node), id);
+  const rowIDs = descendants(rows, node => !hasChildren(node), id);
+  const lookup = (table, col, row) =>
+    table.find(item => item.coord[0] === col && item.coord[1] === row);
+
+  const cells = [];
+  for (let r = 0; r < rowIDs.length; r++) {
+    cells[r] = [];
+    for (let c = 0; c < colIDs.length; c++) {
+      cells[r][c] = lookup(data, colIDs[c], rowIDs[r]);
+    }
+  }
+  return cells;
+}
+// console.table(mapToCells(data, columns, rows));
 
 /**
  * Renders column headers as rows with an optional spacer
@@ -152,19 +199,19 @@ function renderRows(
  * @param {Hierarchy} rows
  * @param {Array<Array<Object>>} values
  */
-function renderTable(columns, rows, values) {
+function renderTable(columns, rows, data) {
   const spacer = {
     colSpan: maxDepth(rows) - 1,
     rowSpan: maxDepth(columns) - 1
   };
-  console.log(spacer);
+  const toCell = (cell, col, row) => td(cell ? cell.value.label : '');
   return table(
     thead(renderColumnHeaders(columns, th, spacer)),
-    tbody(renderRows(rows, values, (value, col, row) => td(value)))
+    tbody(renderRows(rows, mapToCells(data, columns, rows), toCell))
   );
 }
 
 const el = document.querySelector('#dynamic>div');
 // h.traverse(node => console.log(node.data.label));
 
-el.appendChild(renderTable(columns, rows, values));
+el.appendChild(renderTable(columns, rows, data));
