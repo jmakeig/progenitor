@@ -7,6 +7,8 @@ import {
   countDescendantLeaves
 } from './hierarchy.js';
 
+// const columns = new Hierarchy(null, new Hierarchy('A'), new Hierarchy('B'));
+
 // prettier-ignore
 const columns = new Hierarchy(null, 
   new Hierarchy({ label: 'Things' }),
@@ -18,7 +20,9 @@ const columns = new Hierarchy(null,
   ), 
   new Hierarchy({ label: 'Those' }, 
   	new Hierarchy({ label: 'What’s it?' }, 
-      new Hierarchy({ label: 'That' })
+      new Hierarchy({ label: 'That' }, 
+        new Hierarchy({ label: 'More' }, 
+          new Hierarchy({ label: 'Better' })))
     ),
     new Hierarchy({ label: 'Him' })
   ),
@@ -150,9 +154,10 @@ function renderRows(
  */
 function renderTable(columns, rows, values) {
   const spacer = {
-    colSpan: maxDepth(columns),
-    rowSpan: maxDepth(rows)
+    colSpan: maxDepth(rows) - 1,
+    rowSpan: maxDepth(columns) - 1
   };
+  console.log(spacer);
   return table(
     thead(renderColumnHeaders(columns, th, spacer)),
     tbody(renderRows(rows, values, (value, col, row) => td(value)))
