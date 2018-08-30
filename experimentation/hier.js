@@ -95,22 +95,56 @@ const data = [
   { coord: ['Misc.', 'F'], value: { label: 'Misc. F' } },
 ];
 
-function mapToCells(data, columns, rows) {
-  const id = node => node.data.id;
-  const colIDs = descendants(columns, node => !hasChildren(node), id);
-  const rowIDs = descendants(rows, node => !hasChildren(node), id);
-  const lookup = (table, col, row) =>
-    table.find(item => item.coord[0] === col && item.coord[1] === row);
+/**
+ * Transforms a sparse lookup table, keyed on column and row IDs, into a
+ * two-dimensional `Array` suitable for mapping to table cells.
+ *
+ * @param {Array} data `{ coord: [colID, rowID], value: { … } }`
+ * @param {Hierarchy} columnHeaders
+ * @param {Hierarchy} rowHeaders
+ * @return {Array<Array>}
+ */
+function mapToCells(data, columnHeaders, rowHeaders) {
+  const getID = node => node.data.id;
+  const colIDs = descendants(columnHeaders, node => !hasChildren(node), getID);
+  const rowIDs = descendants(rowHeaders, node => !hasChildren(node), getID);
+  const cells = createTable(colIDs.length, rowIDs.length);
 
-  const cells = [];
-  for (let r = 0; r < rowIDs.length; r++) {
-    cells[r] = [];
-    for (let c = 0; c < colIDs.length; c++) {
-      cells[r][c] = lookup(data, colIDs[c], rowIDs[r]);
-    }
+  const err = (needle, haystack) => {
+    throw new ReferenceError(
+      `${needle} is not found in [${haystack.join(', ')}]`
+    );
+  };
+  for (const item of data) {
+    const c = colIDs.indexOf(item.coord[0]);
+    const r = rowIDs.indexOf(item.coord[1]);
+    if (c < 0) err(item.coord[0], colIDs);
+    if (r < 0) err(item.coord[1], rowIDs);
+    cells[r][c] = item;
   }
   return cells;
 }
+
+/**
+ * Eagerly creates a two-dimensional array filled with a static value,
+ * or `undefined`, by default.
+ *
+ * @param {number} [width = 0]
+ * @param {number} [height = 0]
+ * @param {number} [fill = undefined]
+ * @return {Array<Array>}
+ */
+function createTable(width = 0, height = 0, fill = undefined) {
+  const table = [];
+  for (let r = 0; r < height; r++) {
+    table[r] = [];
+    for (let c = 0; c < width; c++) {
+      table[r][c] = fill;
+    }
+  }
+  return table;
+}
+
 // console.table(mapToCells(data, columns, rows));
 
 /**
