@@ -1,2 +1,4 @@
 node_modules/
 browser/
+experimentation/bundle.js
+experimentation/bundle.js.map
