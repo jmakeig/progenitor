@@ -26,6 +26,8 @@
   },
   "dependencies": {
     "dom-helper": "github:jmakeig/dom-helper",
+    "react": "^16.5.0",
+    "react-dom": "^16.5.0",
     "uuid": "^3.3.2"
   }
 }
