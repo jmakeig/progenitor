@@ -39,6 +39,13 @@ function isReact(obj) {
   );
 }
 
+/**
+ *
+ * @param {String|React.Component} name
+ * @param  {...any} stuff Any combination of properties object or React.Component
+ *                        Iterables will be flattened  and applied recusively
+ * @return {React.DetailedReactHTMLElement} Same as `React.createElement`
+ */
 function el(name, ...stuff) {
   const props = {};
   const children = [];
