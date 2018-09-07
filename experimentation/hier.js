@@ -1,5 +1,14 @@
-import { table, thead, tbody, tr, th, td, toFragment, empty } from './react-helper.js';
-import ReactDOM from 'react-dom';
+import {
+  renderInto,
+  table,
+  thead,
+  tbody,
+  tr,
+  th,
+  td,
+  toFragment,
+  empty
+} from './react-helper.js';
 import {
   Hierarchy,
   hasChildren,
@@ -246,12 +255,7 @@ function renderTable(columns, rows, data) {
   );
 }
 
-const el = document.querySelector('#dynamic>div');
-// h.traverse(node => console.log(node.data.label));
-
-// el.appendChild(renderTable(columns, rows, data));
-ReactDOM.render(
+renderInto(
   renderTable(columns, rows, data),
-  // React.createElement(Table, { columns, rows, data }),
-  el
+  document.querySelector('section#dynamic > div')
 );
