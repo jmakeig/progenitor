@@ -54,7 +54,16 @@ function reactComponent(name, ...stuff) {
         dispatch(item);
       }
     } else {
-      Object.assign(props, thing);
+      for (let p in thing) {
+        switch (p) {
+          case 'style':
+          case 'dataset':
+            props[p] = Object.assign({}, props[p], thing[p]);
+            break;
+          default:
+            props[p] = thing[p];
+        }
+      }
     }
   }
   for (const thing of stuff) {
