@@ -1,6 +1,4 @@
-import React from 'react';
 import {
-  renderInto,
   table,
   thead,
   tbody,
@@ -157,7 +155,7 @@ function renderRows(
  * @param {Hierarchy} rows
  * @param {Array<Array<Object>>} values
  */
-function renderTable(columns, rows, data) {
+export default function renderTable(columns, rows, data) {
   const spacer = {
     colSpan: maxDepth(rows) - 1,
     rowSpan: maxDepth(columns) - 1
@@ -168,24 +166,40 @@ function renderTable(columns, rows, data) {
     tbody(renderRows(rows, mapToCells(data, columns, rows), toCell))
   );
 }
-/**
- *
- */
-class Table extends React.PureComponent {
-  render() {
-    const { columns, rows, data } = this.props;
-    return renderTable(columns, rows, data);
-  }
-}
 
-/**
- * Component factory
- *
- * @param {*} columns
- * @param {*} rows
- * @param {*} data
- * @return {React.ComponentElement}
- */
-export default function(columns, rows, data) {
-  return React.createElement(Table, { columns, rows, data });
+// class Table extends React.PureComponent {
+//   render() {
+//     const { columns, rows, data } = this.props;
+//     return renderTable(columns, rows, data);
+//   }
+// }
+
+// /**
+//  * Component factory
+//  *
+//  * @param {*} columns
+//  * @param {*} rows
+//  * @param {*} data
+//  * @return {?}
+//  */
+// export default function(columns, rows, data) {
+//   // Using a stateful Component
+//   return React.createElement(Table, { columns, rows, data });
+//   // Using a function
+//   return renderTable(columns, rows, data);
+// }
+
+/*******************************************************************************
+// General factory pattern. (Who will think of the children?)
+function Asdf(name, ...children) {
+  class Asdf extends React.PureComponent {
+    constructor(props) {
+      super(props);
+    }
+    render() {
+      return span(this.props.name, this.props.children);
+    }
+  }
+  return React.createElement(Asdf, { name }, ...children);
 }
+*******************************************************************************/
