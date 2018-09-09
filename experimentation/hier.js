@@ -1,7 +1,7 @@
 import { renderInto } from './react-helper.js';
 import { Hierarchy } from './hierarchy.js';
 
-import Table from './table.js';
+import Table from './HierarchicalTable.js';
 
 // const columns = new Hierarchy(null, new Hierarchy('A'), new Hierarchy('B'));
 
