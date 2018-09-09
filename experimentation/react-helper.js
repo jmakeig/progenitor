@@ -32,7 +32,14 @@ function isIterable(item, ignoreStrings = true) {
   return false;
 }
 
+/**
+ * Whether something is a React type.
+ *
+ * @param {*} obj
+ * @return {boolean}
+ */
 function isReact(obj) {
+  if (!exists(obj)) return false;
   return (
     obj instanceof React.Component ||
     Symbol.for('react.element') === obj['$$typeof']
