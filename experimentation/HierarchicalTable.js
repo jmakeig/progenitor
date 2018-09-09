@@ -155,7 +155,7 @@ function renderRows(
  * @param {Hierarchy} rows
  * @param {Array<Array<Object>>} values
  */
-export default function renderTable(columns, rows, data) {
+export default function HierarchicalTable(columns, rows, data) {
   const spacer = {
     colSpan: maxDepth(rows) - 1,
     rowSpan: maxDepth(columns) - 1
@@ -170,7 +170,7 @@ export default function renderTable(columns, rows, data) {
 // class Table extends React.PureComponent {
 //   render() {
 //     const { columns, rows, data } = this.props;
-//     return renderTable(columns, rows, data);
+//     return renderTable(columns, rows, data); // renamed to HierarchicalTable above
 //   }
 // }
 

@@ -1,7 +1,7 @@
 import { renderInto } from './react-helper.js';
 import { Hierarchy } from './hierarchy.js';
 
-import Table from './HierarchicalTable.js';
+import HierarchicalTable from './HierarchicalTable.js';
 
 // const columns = new Hierarchy(null, new Hierarchy('A'), new Hierarchy('B'));
 
@@ -91,6 +91,6 @@ const data = [
 ];
 
 renderInto(
-  Table(columns, rows, data),
+  HierarchicalTable(columns, rows, data),
   document.querySelector('section#dynamic > div')
 );
