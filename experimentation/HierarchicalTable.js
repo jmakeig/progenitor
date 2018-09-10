@@ -77,14 +77,14 @@ function createTable(width = 0, height = 0, fill = undefined) {
  * @param {Object} spacer `{ colSpan: #, rowSpan: # }`
  * @return {DocumentFragment}
  */
-function renderColumnHeaders(hierarchy, cellRenderer = th, spacer) {
+function renderColumnHeaders(hierarchy, columnHeaderRenderer = th, spacer) {
   // Place holder of temporary hierarchy
   const next = new Hierarchy(null);
   if (0 === hierarchy.children.length) return empty();
   const rows = hierarchy.children.map((node, i) => {
     next.children.push(...node.children);
     const leaves = countDescendantLeaves(node);
-    const header = cellRenderer(node.data.label, {
+    const header = columnHeaderRenderer(node.data.label, {
       scope: hasChildren(node) ? 'colgroup' : 'col',
       colSpan: leaves,
       rowSpan: hasChildren(node) ? 1 : maxDepth(hierarchy)
@@ -101,7 +101,7 @@ function renderColumnHeaders(hierarchy, cellRenderer = th, spacer) {
     }
     return header;
   });
-  return toFragment(tr(rows), renderColumnHeaders(next, cellRenderer));
+  return toFragment(tr(rows), renderColumnHeaders(next, columnHeaderRenderer));
 }
 
 /**
@@ -149,21 +149,70 @@ function renderRows(
   return rows.map(r => tr(r));
 }
 
+// INPROGRESS:
+//   Use Function.prototype.bind to curry, getting state data via closure
+//   This is inefficient, though becuase each cell will get its own function
+//   See #L173 below
+function cellClick(cell, col, row, evt) {
+  console.log(cell, col, row, evt);
+}
+
+export function measuredCell(cell, col, row) {
+  const mapColors = value => {
+    if (!Number.isFinite(value)) return undefined;
+    const colors = [
+      'rgba(254, 95, 85, 1)',
+      'rgba(240, 182, 127, 1)',
+      'rgba(214, 209, 177, 1)',
+      'rgba(199, 239, 207, 1)',
+      'rgba(238, 245, 219, 1)'
+    ].reverse();
+    const index = Math.floor(cell.value.measure / (1 / colors.length));
+    return colors[index];
+  };
+
+  return td(
+    cell ? Math.floor(cell.value.measure * 100) / 100 : '',
+    {
+      className: 'cell',
+      onClick: cellClick.bind(undefined, cell, col, row) // Results in one function per cell. Is that efficient?
+    },
+    cell && cell.value.measure
+      ? { style: { backgroundColor: mapColors(cell.value.measure) } }
+      : {}
+  );
+}
+
 /**
  *
  * @param {Hierarchy} columns
  * @param {Hierarchy} rows
- * @param {Array<Array<Object>>} values
+ * @param {Object} data
+ * @param {*} cellRenderer
+ * @param {*} headerRenderer
  */
-export default function HierarchicalTable(columns, rows, data) {
+export default function HierarchicalTable(
+  columns,
+  rows,
+  data,
+  cellRenderer = td,
+  headerRenderer = th
+) {
   const spacer = {
     colSpan: maxDepth(rows) - 1,
     rowSpan: maxDepth(columns) - 1
   };
-  const toCell = (cell, col, row) => td(cell ? cell.value.label : '');
+
   return table(
-    thead(renderColumnHeaders(columns, th, spacer)),
-    tbody(renderRows(rows, mapToCells(data, columns, rows), toCell))
+    thead(renderColumnHeaders(columns, headerRenderer, spacer)),
+    tbody(
+      renderRows(
+        rows,
+        mapToCells(data, columns, rows),
+        cellRenderer,
+        headerRenderer
+      )
+    )
   );
 }
 

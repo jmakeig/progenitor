@@ -1,7 +1,7 @@
 import { renderInto } from './react-helper.js';
 import { Hierarchy } from './hierarchy.js';
 
-import HierarchicalTable from './HierarchicalTable.js';
+import HierarchicalTable, { measuredCell } from './HierarchicalTable.js';
 
 // const columns = new Hierarchy(null, new Hierarchy('A'), new Hierarchy('B'));
 
@@ -65,32 +65,86 @@ const rows = new Hierarchy(null,
 const data = [
   // coord: [col, row]
   // { coord: ['Things', '1'], value: { label: 'Things 1' } },
-  { coord: ['Things', '4'], value: { label: 'Things 4' } },
-  { coord: ['Things', '5'], value: { label: 'Things 5' } },
-  { coord: ['Things', '6'], value: { label: 'Things 6' } },
-  { coord: ['Things', '9'], value: { label: 'Things 9' } },
-  { coord: ['Things', 'A'], value: { label: 'Things A' } },
-  // { coord: ['Things', 'D'], value: { label: 'Things D' } },
-  { coord: ['Things', 'F'], value: { label: 'Things F' } },
-  { coord: ['These', '1'], value: { label: 'These 1' } },
-  { coord: ['These', '4'], value: { label: 'These 4' } },
+  {
+    coord: ['Things', '4'],
+    value: { label: 'Things 4', measure: Math.random() }
+  },
+  {
+    coord: ['Things', '5'],
+    value: { label: 'Things 5', measure: Math.random() }
+  },
+  {
+    coord: ['Things', '6'],
+    value: { label: 'Things 6', measure: Math.random() }
+  },
+  {
+    coord: ['Things', '9'],
+    value: { label: 'Things 9', measure: Math.random() }
+  },
+  {
+    coord: ['Things', 'A'],
+    value: { label: 'Things A', measure: Math.random() }
+  },
+  // { coord: ['Things', 'D'], value: { label: 'Things D', measure: Math.random() } },
+  {
+    coord: ['Things', 'F'],
+    value: { label: 'Things F', measure: Math.random() }
+  },
+  {
+    coord: ['These', '1'],
+    value: { label: 'These 1', measure: Math.random() }
+  },
+  {
+    coord: ['These', '4'],
+    value: { label: 'These 4', measure: Math.random() }
+  },
   // { coord: ['These', '5'], value: { label: 'These 5' } },
-  { coord: ['These', '6'], value: { label: 'These 6' } },
-  { coord: ['These', '9'], value: { label: 'These 9' } },
+  {
+    coord: ['These', '6'],
+    value: { label: 'These 6', measure: Math.random() }
+  },
+  {
+    coord: ['These', '9'],
+    value: { label: 'These 9', measure: Math.random() }
+  },
   // { coord: ['These', 'A'], value: { label: 'These A' } },
-  { coord: ['These', 'D'], value: { label: 'These D' } },
+  {
+    coord: ['These', 'D'],
+    value: { label: 'These D', measure: Math.random() }
+  },
   // { coord: ['These', 'F'], value: { label: 'These F' } },
-  { coord: ['Misc.', '1'], value: { label: 'Misc. 1' } },
-  { coord: ['Misc.', '4'], value: { label: 'Misc. 4' } },
+  {
+    coord: ['Misc.', '1'],
+    value: { label: 'Misc. 1', measure: Math.random() }
+  },
+  {
+    coord: ['Misc.', '4'],
+    value: { label: 'Misc. 4', measure: Math.random() }
+  },
   // { coord: ['Misc.', '5'], value: { label: 'Misc. 5' } },
-  { coord: ['Misc.', '6'], value: { label: 'Misc. 6' } },
-  { coord: ['Misc.', '9'], value: { label: 'Misc. 9' } },
-  { coord: ['Misc.', 'A'], value: { label: 'Misc. A' } },
-  { coord: ['Misc.', 'D'], value: { label: 'Misc. D' } },
-  { coord: ['Misc.', 'F'], value: { label: 'Misc. F' } },
+  {
+    coord: ['Misc.', '6'],
+    value: { label: 'Misc. 6', measure: Math.random() }
+  },
+  {
+    coord: ['Misc.', '9'],
+    value: { label: 'Misc. 9', measure: Math.random() }
+  },
+  {
+    coord: ['Misc.', 'A'],
+    value: { label: 'Misc. A', measure: Math.random() }
+  },
+  {
+    coord: ['Misc.', 'D'],
+    value: { label: 'Misc. D', measure: Math.random() }
+  },
+  {
+    coord: ['Misc.', 'F'],
+    value: { label: 'Misc. F', measure: Math.random() }
+  }
 ];
 
 renderInto(
-  HierarchicalTable(columns, rows, data),
+  HierarchicalTable(columns, rows, data, measuredCell),
   document.querySelector('section#dynamic > div')
 );

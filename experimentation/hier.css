@@ -34,17 +34,9 @@ th.spacer {
   border-bottom: solid 3px black;
 }
 
-
-pre {
-  padding: 0.25em 0.5em;
-
-  border: solid 0.5px green;
-
-  font-family: 'SF Mono', 'Inconsolata', 'Consolas', monospace;
-  font-size: 0.65em;
-  line-height: 1.55;
+td.cell {
+  text-align: center;
 }
-
 
 /** DEBUG **/
 /*
