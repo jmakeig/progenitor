@@ -1,7 +1,8 @@
 import { renderInto } from './react-helper.js';
 import { Hierarchy } from './hierarchy.js';
 
-import HierarchicalTable, { measuredCell } from './HierarchicalTable.js';
+import HierarchicalTable from './HierarchicalTable.js';
+import MeasuredCell from './MeasuredCell.js';
 
 // const columns = new Hierarchy(null, new Hierarchy('A'), new Hierarchy('B'));
 
@@ -145,6 +146,6 @@ const data = [
 ];
 
 renderInto(
-  HierarchicalTable(columns, rows, data, measuredCell),
+  HierarchicalTable(columns, rows, data, MeasuredCell),
   document.querySelector('section#dynamic > div')
 );
