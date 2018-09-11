@@ -63,7 +63,7 @@ const rows = new Hierarchy(null,
 //   ['H0', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6'],
 // ];
 
-const data = [
+const data = () => [
   // coord: [col, row]
   // { coord: ['Things', '1'], value: { label: 'Things 1' } },
   {
@@ -145,7 +145,23 @@ const data = [
   }
 ];
 
-renderInto(
-  HierarchicalTable(columns, rows, data, MeasuredCell),
-  document.querySelector('section#dynamic > div')
-);
+const store = {
+  callback: () => {},
+  dispatch() {
+    // Update model
+    // TODO: …
+    this.callback({ columns, rows, data: data() });
+  },
+  subscribe(callback) {
+    this.callback = callback;
+  }
+};
+store.subscribe(model => {
+  const { columns, rows, data } = model;
+  renderInto(
+    HierarchicalTable(columns, rows, data, MeasuredCell),
+    document.querySelector('section#dynamic > div')
+  );
+});
+
+setInterval(() => store.dispatch(), 500);
