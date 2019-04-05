@@ -4,18 +4,25 @@ import replace from 'rollup-plugin-replace';
 // import babel from 'rollup-plugin-babel';
 
 export default {
-  //input: 'browser/src/main.js',
+  external: ['react', 'react-dom'],
   input: 'experimentation/hier.js',
   output: {
     file: 'experimentation/bundle.js',
     format: 'iife',
-    sourcemap: true
+    sourcemap: true,
+
+    globals: {
+      react: 'React',
+      'react-dom': 'ReactDOM'
+    }
   },
+
   plugins: [
     replace({
       'process.env.NODE_ENV': JSON.stringify('development')
     }),
     nodeResolve({
+      browser: true,
       jsnext: true,
       main: true
     }),
