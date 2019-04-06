@@ -25,9 +25,7 @@ export default {
       'process.env.NODE_ENV': JSON.stringify('development')
     }),
     nodeResolve({
-      browser: true,
-      jsnext: true,
-      main: true
+      browser: true
     }),
     commonjs({
       include: 'node_modules/**'
